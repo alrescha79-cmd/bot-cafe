@@ -1,4 +1,4 @@
-module github.com/son/bot-cafe
+module github.com/alrescha79-cmd/bot-cafe
 
 go 1.21
 

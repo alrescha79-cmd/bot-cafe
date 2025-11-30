@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/alrescha79-cmd/bot-cafe/shared"
 	"github.com/joho/godotenv"
-	"github.com/son/bot-cafe/shared"
 )
 
 func main() {

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/son/bot-cafe/shared"
+	"github.com/alrescha79-cmd/bot-cafe/shared"
 )
 
 // Repository handles database operations

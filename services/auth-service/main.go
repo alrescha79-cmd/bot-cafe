@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/alrescha79-cmd/bot-cafe/shared"
 	"github.com/joho/godotenv"
-	"github.com/son/bot-cafe/shared"
 )
 
 func main() {

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/son/bot-cafe/shared"
+	"github.com/alrescha79-cmd/bot-cafe/shared"
 )
 
 // Handler handles HTTP requests

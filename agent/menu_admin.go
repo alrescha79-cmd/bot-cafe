@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/alrescha79-cmd/bot-cafe/shared"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/son/bot-cafe/shared"
 )
 
 // ADMIN MENU FUNCTIONS

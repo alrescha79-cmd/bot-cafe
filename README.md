@@ -26,7 +26,7 @@ Bot Telegram berbasis **microservices** untuk mengelola café/resto dengan fitur
 
 ```bash
 # Clone repository
-git clone <repo-url>
+git clone https://github.com/alrescha79-cmd/bot-cafe.git
 cd bot-cafe
 
 # Initialize (creates .env and .vars.json from examples)
@@ -214,6 +214,8 @@ Contributions are welcome! Please:
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 👤 Author
+
+- **Alrescha79** - [alrescha79](https://github.com/alrescha79-cmd)
 
 Built with ❤️ using microservices architecture best practices.
 
