@@ -641,3 +641,179 @@ func handleAddCategoryName(msg *tgbotapi.Message, userID int64) {
 	sendMessage(msg.Chat.ID, fmt.Sprintf("✅ Kategori *%s* berhasil ditambahkan!", categoryName), nil)
 	showAdminCategoryManagement(msg.Chat.ID)
 }
+
+// CAFE INF EDIT DIALOG FUNCTIONS
+
+func startEditCafeInfoDialog(chatID int64, userID int64) {
+	// First, get current cafe info
+	resp, err := httpClient.Post(infoServiceURL, shared.Request{
+		Action: "read",
+	})
+
+	if err != nil || !resp.Success {
+		sendMessage(chatID, "⚠️ Gagal memuat informasi café.", nil)
+		return
+	}
+
+	infoData := resp.Data.(map[string]interface{})["info"].(map[string]interface{})
+	name := infoData["name"].(string)
+	address := infoData["address"].(string)
+	phone := infoData["phone"].(string)
+	email, _ := infoData["email"].(string)
+	openingHour := infoData["opening_hour"].(string)
+	closingHour := infoData["closing_hour"].(string)
+	description := infoData["description"].(string)
+
+	text := "✏️ *Edit Info Café*\n\n"
+	text += "*Info Saat Ini:*\n\n"
+	text += fmt.Sprintf("📍 *Nama:* %s\n", name)
+	text += fmt.Sprintf("🏠 *Alamat:* %s\n", address)
+	text += fmt.Sprintf("📞 *Telepon:* %s\n", phone)
+	if email != "" {
+		text += fmt.Sprintf("📧 *Email:* %s\n", email)
+	}
+	text += fmt.Sprintf("🕐 *Jam Buka:* %s\n", openingHour)
+	text += fmt.Sprintf("🕔 *Jam Tutup:* %s\n", closingHour)
+	if description != "" {
+		text += fmt.Sprintf("📝 *Deskripsi:* %s\n", description)
+	}
+	text += "\n_Pilih field yang ingin diubah:_"
+
+	keyboard := tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("📍 Edit Nama", "edit_info:name"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("🏠 Edit Alamat", "edit_info:address"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("📞 Edit Telepon", "edit_info:phone"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("📧 Edit Email", "edit_info:email"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("🕐 Edit Jam Buka", "edit_info:opening_hour"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("🕔 Edit Jam Tutup", "edit_info:closing_hour"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("📝 Edit Deskripsi", "edit_info:description"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("⬅️ Kembali", "admin_info"),
+		),
+	)
+
+	sendMessage(chatID, text, keyboard)
+}
+
+func handleEditCafeInfoName(msg *tgbotapi.Message, userID int64) {
+	name := strings.TrimSpace(msg.Text)
+	if name == "" {
+		sendMessage(msg.Chat.ID, "⚠️ Nama café tidak boleh kosong. Coba lagi:", nil)
+		return
+	}
+
+	updateCafeInfo(msg.Chat.ID, userID, map[string]interface{}{"name": name})
+}
+
+func handleEditCafeInfoAddress(msg *tgbotapi.Message, userID int64) {
+	address := strings.TrimSpace(msg.Text)
+	if address == "" {
+		sendMessage(msg.Chat.ID, "⚠️ Alamat tidak boleh kosong. Coba lagi:", nil)
+		return
+	}
+
+	updateCafeInfo(msg.Chat.ID, userID, map[string]interface{}{"address": address})
+}
+
+func handleEditCafeInfoPhone(msg *tgbotapi.Message, userID int64) {
+	phone := strings.TrimSpace(msg.Text)
+	if phone == "" {
+		sendMessage(msg.Chat.ID, "⚠️ Telepon tidak boleh kosong. Coba lagi:", nil)
+		return
+	}
+
+	updateCafeInfo(msg.Chat.ID, userID, map[string]interface{}{"phone": phone})
+}
+
+func handleEditCafeInfoEmail(msg *tgbotapi.Message, userID int64) {
+	email := strings.TrimSpace(msg.Text)
+	updateCafeInfo(msg.Chat.ID, userID, map[string]interface{}{"email": email})
+}
+
+func handleEditCafeInfoOpeningHour(msg *tgbotapi.Message, userID int64) {
+	openingHour := strings.TrimSpace(msg.Text)
+	if openingHour == "" {
+		sendMessage(msg.Chat.ID, "⚠️ Jam buka tidak boleh kosong. Coba lagi:", nil)
+		return
+	}
+
+	updateCafeInfo(msg.Chat.ID, userID, map[string]interface{}{"opening_hour": openingHour})
+}
+
+func handleEditCafeInfoClosingHour(msg *tgbotapi.Message, userID int64) {
+	closingHour := strings.TrimSpace(msg.Text)
+	if closingHour == "" {
+		sendMessage(msg.Chat.ID, "⚠️ Jam tutup tidak boleh kosong. Coba lagi:", nil)
+		return
+	}
+
+	updateCafeInfo(msg.Chat.ID, userID, map[string]interface{}{"closing_hour": closingHour})
+}
+
+func handleEditCafeInfoDescription(msg *tgbotapi.Message, userID int64) {
+	description := strings.TrimSpace(msg.Text)
+	if description == "-" {
+		description = ""
+	}
+
+	updateCafeInfo(msg.Chat.ID, userID, map[string]interface{}{"description": description})
+}
+
+func updateCafeInfo(chatID int64, userID int64, data map[string]interface{}) {
+	resp, err := httpClient.Post(infoServiceURL, shared.Request{
+		Action:  "update",
+		Payload: data,
+	})
+
+	delete(userStates, userID)
+	delete(userTempData, userID)
+
+	if err != nil || !resp.Success {
+		sendMessage(chatID, "⚠️ Gagal mengupdate informasi café. Silakan coba lagi.", nil)
+		return
+	}
+
+	infoData := resp.Data.(map[string]interface{})["info"].(map[string]interface{})
+	name := infoData["name"].(string)
+	address := infoData["address"].(string)
+	phone := infoData["phone"].(string)
+	email, _ := infoData["email"].(string)
+	openingHour := infoData["opening_hour"].(string)
+	closingHour := infoData["closing_hour"].(string)
+	description := infoData["description"].(string)
+
+	text := "✅ *Info Café berhasil diperbarui!*\n\n"
+	text += fmt.Sprintf("📍 *Nama:* %s\n", name)
+	text += fmt.Sprintf("🏠 *Alamat:* %s\n", address)
+	text += fmt.Sprintf("📞 *Telepon:* %s\n", phone)
+	if email != "" {
+		text += fmt.Sprintf("📧 *Email:* %s\n", email)
+	}
+	text += fmt.Sprintf("🕐 *Jam Buka:* %s\n", openingHour)
+	text += fmt.Sprintf("🕔 *Jam Tutup:* %s\n", closingHour)
+	if description != "" {
+		text += fmt.Sprintf("📝 *Deskripsi:* %s\n", description)
+	}
+
+	keyboard := tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("⬅️ Kembali", "admin_info"),
+		),
+	)
+
+	sendMessage(chatID, text, keyboard)
+}

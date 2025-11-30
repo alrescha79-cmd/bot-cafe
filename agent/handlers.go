@@ -222,7 +222,7 @@ func handleCallback(callback *tgbotapi.CallbackQuery) {
 		if !isAdmin(userID, username) {
 			return
 		}
-		sendMessage(callback.Message.Chat.ID, "⚠️ Fitur edit info café akan segera ditambahkan.", nil)
+		startEditCafeInfoDialog(callback.Message.Chat.ID, userID)
 
 	// Legacy handlers (keep for compatibility)
 	case "add_menu":
@@ -318,6 +318,45 @@ func handleCallback(callback *tgbotapi.CallbackQuery) {
 		showPromos(callback.Message.Chat.ID, true)
 	case "show_info":
 		showCafeInfo(callback.Message.Chat.ID)
+	case "edit_info":
+		if !isAdmin(userID, username) {
+			return
+		}
+		if len(parts) > 1 {
+			field := parts[1]
+			var prompt string
+			var state string
+
+			switch field {
+			case "name":
+				prompt = "Masukkan nama café baru:\n\n(Ketik /cancel untuk membatalkan)"
+				state = "edit_cafe_info_name"
+			case "address":
+				prompt = "Masukkan alamat café baru:\n\n(Ketik /cancel untuk membatalkan)"
+				state = "edit_cafe_info_address"
+			case "phone":
+				prompt = "Masukkan nomor telepon baru:\n\n(Ketik /cancel untuk membatalkan)"
+				state = "edit_cafe_info_phone"
+			case "email":
+				prompt = "Masukkan email baru (atau ketik - untuk menghapus):\n\n(Ketik /cancel untuk membatalkan)"
+				state = "edit_cafe_info_email"
+			case "opening_hour":
+				prompt = "Masukkan jam buka baru (contoh: 08:00):\n\n(Ketik /cancel untuk membatalkan)"
+				state = "edit_cafe_info_opening_hour"
+			case "closing_hour":
+				prompt = "Masukkan jam tutup baru (contoh: 22:00):\n\n(Ketik /cancel untuk membatalkan)"
+				state = "edit_cafe_info_closing_hour"
+			case "description":
+				prompt = "Masukkan deskripsi baru (atau ketik - untuk menghapus):\n\n(Ketik /cancel untuk membatalkan)"
+				state = "edit_cafe_info_description"
+			default:
+				return
+			}
+
+			userStates[userID] = state
+			userTempData[userID] = make(map[string]interface{})
+			sendMessage(callback.Message.Chat.ID, prompt, nil)
+		}
 	case "show_admin_panel":
 		if !isAdmin(userID, username) {
 			sendMessage(callback.Message.Chat.ID, "⚠️ Akses ditolak.", nil)

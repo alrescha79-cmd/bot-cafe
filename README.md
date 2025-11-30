@@ -1,385 +1,224 @@
 # 🤖 Bot Telegram Café/Resto
 
-Bot Telegram berbasis **arsitektur microservices** untuk mengelola café/resto dengan fitur lengkap untuk admin dan user.
+Bot Telegram berbasis **microservices** untuk mengelola café/resto dengan fitur lengkap untuk admin dan pelanggan.
 
-## 📋 Fitur
+[![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat\u0026logo=go)](https://go.dev/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-### User Features
-- 📋 Melihat daftar menu (makanan & minuman)
-- 💰 Melihat harga menu
-- 🎉 Melihat promo aktif
-- ℹ️ Melihat info café (alamat, jam buka, kontak)
-- 📱 Navigasi mudah via keyboard Telegram
+## ✨ Fitur Utama
 
-### Admin Features
-- ➕ CRUD Menu (Create, Read, Update, Delete)
-- 🎁 CRUD Promo
-- ℹ️ CRUD Info Café
-- 📁 CRUD Kategori Menu
-- 👨‍💼 Multi-admin support
-- 🔐 Autentikasi admin via `.vars.json`
+### 👥 Untuk Pelanggan
+- 📋 Lihat menu lengkap dengan kategori
+- 💰 Cek harga dan deskripsi produk
+- 🎉 Info promo dan diskon terkini
+- ℹ️ Informasi café (alamat, jam buka, kontak)
 
-## 🏗️ Arsitektur
-
-Aplikasi ini dibangun dengan **5 microservices**:
-
-1. **auth-service** (Port 8081) - Manajemen autentikasi admin
-2. **menu-service** (Port 8082) - Manajemen menu dan kategori
-3. **promo-service** (Port 8083) - Manajemen promo
-4. **info-service** (Port 8084) - Manajemen info café
-5. **media-service** (Port 8085) - Manajemen media/foto (optional)
-
-Plus **1 agent** (Bot Telegram) yang berkomunikasi dengan semua microservices.
-
-## 📁 Struktur Proyek
-
-```
-/bot-cafe
-├── /agent                    # Telegram Bot Agent
-│   ├── main.go
-│   ├── handlers.go
-│   ├── menu_user.go
-│   └── menu_admin.go
-├── /services
-│   ├── /auth-service
-│   ├── /menu-service
-│   ├── /promo-service
-│   ├── /info-service
-│   └── /media-service
-├── /shared                   # Shared utilities
-│   ├── database.go
-│   ├── http_client.go
-│   ├── errors.go
-│   ├── logger.go
-│   └── utils.go
-├── /deployments
-│   ├── docker-compose.yml
-│   ├── Dockerfile.service
-│   └── Dockerfile.agent
-├── .env.example
-├── .vars.json.example
-├── Makefile
-└── README.md
-```
+### 👨‍💼 Untuk Admin
+- ➕ **CRUD Menu** - Kelola menu dan kategori
+- 🎁 **CRUD Promo** - Buat dan kelola promo
+- ℹ️ **CRUD Info Café** - Update informasi café
+- 👥 **Multi-Admin** - Dukungan multiple admin
+- 🔐 **Autentikasi Aman** - Admin via Telegram ID
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- Docker & Docker Compose
-- Go 1.21+ (untuk development tanpa Docker)
-- Telegram Bot Token (dari [@BotFather](https://t.me/botfather))
-
-### 1. Clone & Setup
+### 1. Setup Project
 
 ```bash
 # Clone repository
 git clone <repo-url>
 cd bot-cafe
 
-# Initialize project
+# Initialize (creates .env and .vars.json from examples)
 make init
 
-# Edit konfigurasi
+# Configure
 nano .env          # Set TELEGRAM_BOT_TOKEN
 nano .vars.json    # Set admin Telegram IDs
 ```
 
-### 2. Konfigurasi
+### 2. Pilih Development Mode
 
-#### `.env`
-```env
-TELEGRAM_BOT_TOKEN=your_bot_token_here
-```
-
-#### `.vars.json`
-```json
-{
-  "admin_telegram_ids": [
-    "123456789"
-  ],
-  "admin_usernames": [
-    "your_username"
-  ]
-}
-```
-
-> **Penting**: File `.vars.json` tidak akan di-commit ke git (ada di `.gitignore`)
-
-### 3. Pilih Mode Development
-
-#### Option A: Dengan Docker (Recommended - Hot Reload)
-
+**Option A: Lokal dengan Hot Reload (Recommended)**
 ```bash
-# Start semua services dengan hot reload
-make dev
-```
-
-Bot akan otomatis reload saat ada perubahan code di dalam Docker!
-
-#### Option B: Lokal Tanpa Docker (Satu Perintah)
-
-```bash
-# Install dependencies (pertama kali)
-make deps
-
-# Jalankan semua services sekaligus
-make run-local
-# atau
-make dev-local
-```
-
-Semua services akan berjalan bersamaan dalam satu terminal. Tekan `Ctrl+C` untuk stop semua.
-
-#### Option C: Lokal Dengan Hot Reload (Tanpa Docker)
-
-```bash
-# Install Air jika belum (akan otomatis jika belum ada)
-go install github.com/cosmtrek/air@latest
-
-# Jalankan dengan hot reload lokal
 make dev-local-hot
 ```
 
-Bot akan otomatis reload saat ada perubahan code, **tanpa Docker**!
-
-#### Option D: Manual (Build & Run)
-
+**Option B: Docker dengan Hot Reload**
 ```bash
-# Build semua services
-make build
-
-# Jalankan (butuh terminal terpisah untuk setiap service)
-./bin/auth-service &
-./bin/menu-service &
-./bin/promo-service &
-./bin/info-service &
-./bin/media-service &
-./bin/agent
+make dev
 ```
 
-## 🎮 Cara Menggunakan Bot
+**Option C: Lokal Tanpa Hot Reload**
+```bash
+make dev-local
+```
 
-### Sebagai User
+### 3. Mulai Gunakan Bot
 
-1. Start bot: `/start`
-2. Pilih menu:
-   - 📋 Lihat Menu
-   - 🎉 Lihat Promo
-   - ℹ️ Info Café
+Buka Telegram, cari bot Anda, dan ketik `/start`
 
-### Sebagai Admin
+✅ Selesai! Bot siap digunakan.
 
-1. Pastikan Telegram ID Anda ada di `.vars.json`
-2. Start bot: `/start`
-3. Klik **👨‍💼 Panel Admin**
-4. Pilih menu admin:
-   - Kelola Menu
-   - Kelola Promo
-   - Kelola Info Café
-   - Kelola Kategori
+## 📚 Dokumentasi Lengkap
 
-## 🔧 Commands (Makefile)
+- **[Development Setup](docs/guides/development-setup.md)** - Panduan setup development lengkap
+- **[VPS Deployment](docs/guides/vps-deployment.md)** - Deploy ke VPS production
+- **[Troubleshooting](docs/guides/troubleshooting.md)** - Solusi masalah umum
+- **[Architecture](docs/reference/architecture.md)** - Arsitektur microservices
+- **[API Reference](docs/reference/api.md)** - Dokumentasi API
+- **[Makefile Commands](docs/reference/makefile-commands.md)** - Referensi command
+- **[Admin Workflows](docs/examples/admin-workflows.md)** - Contoh penggunaan admin
+
+## 🏗️ Arsitektur
+
+Aplikasi ini menggunakan **5 microservices**:
+
+| Service | Port | Fungsi |
+|---------|------|--------|
+| auth-service | 8081 | Autentikasi admin |
+| menu-service | 8082 | Manajemen menu & kategori |
+| promo-service | 8083 | Manajemen promo |
+| info-service | 8084 | Informasi café |
+| media-service | 8085 | Upload media (optional) |
+
+Plus **1 agent** (Telegram Bot) yang berkomunikasi dengan semua services.
+
+Setiap service memiliki database SQLite sendiri untuk independensi dan scalability.
+
+## 🛠️ Tech Stack
+
+- **Backend**: Go 1.21+
+- **Database**: SQLite3 (per service)
+- **Bot Framework**: go-telegram-bot-api
+- **Containerization**: Docker & Docker Compose
+- **Hot Reload**: Air v1.49.0
+
+## 🔧 Commands Penting
 
 ```bash
 # Setup & Dependencies
-make help           # Lihat semua commands
 make init           # Setup awal project
 make deps           # Install Go dependencies
 
-# Development - Lokal (Tanpa Docker)
-make run-local      # Jalankan semua services lokal (satu perintah)
-make dev-local      # Alias untuk run-local
-make dev-local-hot  # Jalankan lokal dengan hot reload (tanpa Docker)
-make stop           # Stop semua services lokal
+# Development
+make dev-local-hot  # Run lokal dengan hot reload (tanpa Docker)
+make dev            # Run dengan Docker + hot reload
+make dev-local      # Run lokal tanpa hot reload
+make stop           # Stop semua services
 
-# Development - Docker (Dengan Hot Reload)
-make dev            # Start dev environment dengan Docker hot reload
+# Build & Clean
+make build          # Build semua services
+make clean          # Bersihkan build artifacts
+
+# Deployment
+make docker-build   # Build Docker images
 make docker-up      # Start containers
 make docker-down    # Stop containers
 make docker-logs    # Lihat logs
-make docker-build   # Build Docker images
-
-# Build & Test
-make build          # Build semua services
-make test           # Run tests
-make clean          # Bersihkan build artifacts
 ```
 
-### 🌟 Rekomendasi Command
+Lihat [Makefile Commands Reference](docs/reference/makefile-commands.md) untuk command lengkap.
 
-- **Pertama kali**: `make init` → edit `.env` & `.vars.json`
-- **Development cepat tanpa Docker**: `make dev-local` (satu perintah, semua jalan!)
-- **Development dengan hot reload tanpa Docker**: `make dev-local-hot`
-- **Development dengan Docker**: `make dev`
-- **Stop services lokal**: `make stop` atau `Ctrl+C`
+## 🔥 Hot Reload
 
-## 📡 API Contract
+Aplikasi mendukung **automatic hot reload** saat development:
 
-Semua microservices menggunakan format request/response yang sama:
+- Edit file `.go` → Auto rebuild → Service restart
+- **Lokal**: Menggunakan [Air](https://github.com/cosmtrek/air) v1.49.0
+- **Docker**: Built-in volume mounting
 
-### Request Format
-```json
-{
-  "action": "create|read|update|delete|list",
-  "payload": {
-    "key": "value"
-  }
-}
-```
-
-### Response Format (Success)
-```json
-{
-  "success": true,
-  "data": {
-    "result": "data"
-  }
-}
-```
-
-### Response Format (Error)
-```json
-{
-  "success": false,
-  "error": {
-    "code": "ERR_CODE",
-    "message": "User-friendly error message"
-  }
-}
-```
+No manual restart needed! 🎉
 
 ## 🗄️ Database
 
-Setiap microservice memiliki database SQLite sendiri:
+Setiap microservice memiliki database terpisah:
 
-- `auth.db` - Data admin & sessions
-- `menu.db` - Data menu & kategori
-- `promo.db` - Data promo
-- `info.db` - Data info café
-- `media.db` - Data media/foto
-
-Database disimpan di volume Docker `/data`
+- `data/auth.db` - Admin & sessions
+- `data/menu.db` - Menu & kategori
+- `data/promo.db` - Promo & diskon
+- `data/info.db` - Info café
+- `data/media.db` - Media files
 
 ## 🔐 Security
 
-- Admin ID disimpan di `.vars.json` (tidak masuk git)
-- Session token untuk admin
-- Input sanitization untuk mencegah SQL injection
-- Validasi input untuk semua operasi CRUD
+- ✅ Admin authentication via Telegram ID
+- ✅ Session-based admin verification
+- ✅ Input sanitization (SQL injection prevention)
+- ✅ Environment variables untuk secrets
+- ✅ `.vars.json` tidak masuk git (`.gitignore`)
 
-## 🐳 Hot Reload (Development)
+## 📊 Project Structure
 
-Hot reload menggunakan [Air](https://github.com/cosmtrek/air):
-
-- **Otomatis reload** saat file `.go` berubah
-- **Tidak perlu restart** Docker container
-- **Cepat** - hanya recompile service yang berubah
-
-Edit code → Save → Auto reload! 🔥
-
-## 📝 Contoh Alur CRUD Menu (Admin)
-
-1. Admin: klik "Kelola Menu" → "Tambah Menu"
-2. Bot: "Masukkan nama menu"
-3. Admin: "Cappuccino"
-4. Bot: "Masukkan harga"
-5. Admin: "25000"
-6. Bot: "Pilih kategori"
-7. Admin: "Coffee"
-8. Bot: "Masukkan deskripsi (- untuk skip)"
-9. Admin: "Kopi susu premium"
-10. Bot: "✅ Menu berhasil ditambahkan!"
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-make test
-
-# Test specific service
-cd services/menu-service && go test
-
-# Test with coverage
-go test -cover ./...
+```
+bot-cafe/
+├── agent/              # Telegram Bot
+├── services/           # Microservices
+│   ├── auth-service/
+│   ├── menu-service/
+│   ├── promo-service/
+│   ├── info-service/
+│   └── media-service/
+├── shared/             # Shared utilities
+├── deployments/        # Docker configs
+├── docs/               # Documentation
+└── Makefile           # Build commands
 ```
 
-## 📊 Monitoring & Logs
+## 🐛 Troubleshooting
 
+**Bot tidak respond?**
 ```bash
-# Lihat logs semua services
+# Check logs
 make docker-logs
 
-# Logs service tertentu
-docker logs cafe-auth-service
-docker logs cafe-menu-service
-docker logs cafe-bot-agent
-
-# Logs realtime
-docker logs -f cafe-bot-agent
+# Verify bot token
+cat .env | grep TELEGRAM_BOT_TOKEN
 ```
 
-## 🛠️ Development Tips
-
-### Menambah Fitur Baru
-
-1. Buat endpoint di microservice terkait
-2. Update handler di agent
-3. Tambahkan UI/keyboard di bot
-4. Test perubahan (auto reload!)
-
-### Debugging
-
+**Access denied untuk admin?**
 ```bash
-# Check service health
-curl http://localhost:8081/health
-curl http://localhost:8082/health
+# Verify admin ID di .vars.json
+cat .vars.json
 
-# Test API manually
-curl -X POST http://localhost:8082 \
-  -H "Content-Type: application/json" \
-  -d '{"action":"list","payload":{}}'
+# Restart agent
+docker restart cafe-bot-agent
+# atau untuk lokal: make stop && make dev-local-hot
 ```
 
-## 🚧 Troubleshooting
+**Hot reload tidak bekerja?**
 
-### Bot tidak respond
-- Cek `TELEGRAM_BOT_TOKEN` di `.env`
-- Cek logs: `make docker-logs`
+Lihat [Troubleshooting Guide](docs/guides/troubleshooting.md#hot-reload-issues) untuk solusi lengkap.
 
-### "Access denied" untuk admin
-- Cek Telegram ID di `.vars.json`
-- Restart agent: `docker restart cafe-bot-agent`
+## 🚀 Roadmap
 
-### Hot reload tidak bekerja
-- Cek volume mounts di `docker-compose.yml`
-- Restart containers: `make docker-restart`
-
-## 🗺️ Roadmap
-
-- [ ] Broadcast message ke semua users
+- [ ] Broadcast message ke users
 - [ ] Upload foto menu via bot
-- [ ] Laporan penjualan
-- [ ] Integrasi payment gateway
+- [ ] Order tracking system
+- [ ] Payment gateway integration
+- [ ] Analytics dashboard
 - [ ] Multi-language support
-
-## 📄 License
-
-MIT License
-
-## 👤 Author
-
-Built with ❤️ following microservices architecture best practices
 
 ## 🤝 Contributing
 
-1. Fork the repo
-2. Create feature branch
-3. Commit changes
-4. Push to branch
-5. Create Pull Request
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👤 Author
+
+Built with ❤️ using microservices architecture best practices.
 
 ---
 
 **Happy Coding!** 🚀
 
-Jika ada pertanyaan, silakan buka issue di GitHub.
+For questions or issues, please open an issue on GitHub.
