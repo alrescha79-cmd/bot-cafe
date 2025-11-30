@@ -1,0 +1,55 @@
+# Base Dockerfile for microservices with hot reload
+FROM golang:1.21-alpine
+
+# Install air for hot reload
+RUN go install github.com/cosmtrek/air@latest
+
+# Install build dependencies
+RUN apk add --no-cache gcc musl-dev sqlite-dev
+
+ARG SERVICE_NAME
+WORKDIR /app
+
+# Copy go.mod and go.sum
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy shared package
+COPY shared/ ./shared/
+
+# Copy service code
+COPY services/${SERVICE_NAME}/ ./services/${SERVICE_NAME}/
+
+# Create air config
+RUN echo 'root = "."' > /app/services/${SERVICE_NAME}/.air.toml && \
+    echo 'testdata_dir = "testdata"' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo 'tmp_dir = "tmp"' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '[build]' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  args_bin = []' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  bin = "./tmp/main"' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  cmd = "go build -o ./tmp/main ./services/'${SERVICE_NAME}'"' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  delay = 1000' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  exclude_dir = ["assets", "tmp", "vendor", "testdata"]' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  exclude_file = []' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  exclude_regex = ["_test.go"]' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  exclude_unchanged = false' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  follow_symlink = false' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  full_bin = ""' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  include_dir = ["services/'${SERVICE_NAME}'", "shared"]' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  include_ext = ["go", "tpl", "tmpl", "html"]' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  include_file = []' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  kill_delay = "0s"' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  log = "build-errors.log"' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  poll = false' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  poll_interval = 0' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  rerun = false' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  rerun_delay = 500' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  send_interrupt = false' >> /app/services/${SERVICE_NAME}/.air.toml && \
+    echo '  stop_on_error = false' >> /app/services/${SERVICE_NAME}/.air.toml
+
+WORKDIR /app
+
+CMD ["air", "-c", "/app/services/${SERVICE_NAME}/.air.toml"]

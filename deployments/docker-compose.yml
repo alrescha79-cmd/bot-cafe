@@ -1,0 +1,153 @@
+version: '3.8'
+
+services:
+  # Auth Service
+  auth-service:
+    build:
+      context: .
+      dockerfile: deployments/Dockerfile.service
+      args:
+        SERVICE_NAME: auth-service
+    container_name: cafe-auth-service
+    ports:
+      - "8081:8081"
+    environment:
+      - AUTH_SERVICE_PORT=8081
+      - AUTH_DB_PATH=/data/auth.db
+    volumes:
+      - ./services/auth-service:/app/services/auth-service
+      - ./shared:/app/shared
+      - auth-data:/data
+      - go-mod-cache:/go/pkg/mod
+    networks:
+      - cafe-network
+    command: air -c /app/services/auth-service/.air.toml
+
+  # Menu Service
+  menu-service:
+    build:
+      context: .
+      dockerfile: deployments/Dockerfile.service
+      args:
+        SERVICE_NAME: menu-service
+    container_name: cafe-menu-service
+    ports:
+      - "8082:8082"
+    environment:
+      - MENU_SERVICE_PORT=8082
+      - MENU_DB_PATH=/data/menu.db
+    volumes:
+      - ./services/menu-service:/app/services/menu-service
+      - ./shared:/app/shared
+      - menu-data:/data
+      - go-mod-cache:/go/pkg/mod
+    networks:
+      - cafe-network
+    command: air -c /app/services/menu-service/.air.toml
+
+  # Promo Service
+  promo-service:
+    build:
+      context: .
+      dockerfile: deployments/Dockerfile.service
+      args:
+        SERVICE_NAME: promo-service
+    container_name: cafe-promo-service
+    ports:
+      - "8083:8083"
+    environment:
+      - PROMO_SERVICE_PORT=8083
+      - PROMO_DB_PATH=/data/promo.db
+    volumes:
+      - ./services/promo-service:/app/services/promo-service
+      - ./shared:/app/shared
+      - promo-data:/data
+      - go-mod-cache:/go/pkg/mod
+    networks:
+      - cafe-network
+    command: air -c /app/services/promo-service/.air.toml
+
+  # Info Service
+  info-service:
+    build:
+      context: .
+      dockerfile: deployments/Dockerfile.service
+      args:
+        SERVICE_NAME: info-service
+    container_name: cafe-info-service
+    ports:
+      - "8084:8084"
+    environment:
+      - INFO_SERVICE_PORT=8084
+      - INFO_DB_PATH=/data/info.db
+    volumes:
+      - ./services/info-service:/app/services/info-service
+      - ./shared:/app/shared
+      - info-data:/data
+      - go-mod-cache:/go/pkg/mod
+    networks:
+      - cafe-network
+    command: air -c /app/services/info-service/.air.toml
+
+  # Media Service
+  media-service:
+    build:
+      context: .
+      dockerfile: deployments/Dockerfile.service
+      args:
+        SERVICE_NAME: media-service
+    container_name: cafe-media-service
+    ports:
+      - "8085:8085"
+    environment:
+      - MEDIA_SERVICE_PORT=8085
+      - MEDIA_DB_PATH=/data/media.db
+    volumes:
+      - ./services/media-service:/app/services/media-service
+      - ./shared:/app/shared
+      - media-data:/data
+      - go-mod-cache:/go/pkg/mod
+    networks:
+      - cafe-network
+    command: air -c /app/services/media-service/.air.toml
+
+  # Telegram Bot Agent
+  agent:
+    build:
+      context: .
+      dockerfile: deployments/Dockerfile.agent
+    container_name: cafe-bot-agent
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - AUTH_SERVICE_URL=http://auth-service:8081
+      - MENU_SERVICE_URL=http://menu-service:8082
+      - PROMO_SERVICE_URL=http://promo-service:8083
+      - INFO_SERVICE_URL=http://info-service:8084
+      - MEDIA_SERVICE_URL=http://media-service:8085
+      - ADMIN_VARS_FILE=/app/.vars.json
+    volumes:
+      - ./agent:/app/agent
+      - ./shared:/app/shared
+      - ./.vars.json:/app/.vars.json:ro
+      - go-mod-cache:/go/pkg/mod
+    networks:
+      - cafe-network
+    depends_on:
+      - auth-service
+      - menu-service
+      - promo-service
+      - info-service
+      - media-service
+    command: air -c /app/agent/.air.toml
+
+networks:
+  cafe-network:
+    driver: bridge
+
+volumes:
+  auth-data:
+  menu-data:
+  promo-data:
+  info-data:
+  media-data:
+  go-mod-cache:

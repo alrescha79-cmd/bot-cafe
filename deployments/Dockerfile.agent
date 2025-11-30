@@ -1,0 +1,52 @@
+# Dockerfile for Telegram Bot Agent with hot reload
+FROM golang:1.21-alpine
+
+# Install air for hot reload
+RUN go install github.com/cosmtrek/air@latest
+
+# Install build dependencies
+RUN apk add --no-cache gcc musl-dev sqlite-dev
+
+WORKDIR /app
+
+# Copy go.mod and go.sum
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy shared package
+COPY shared/ ./shared/
+
+# Copy agent code
+COPY agent/ ./agent/
+
+# Create air config for agent
+RUN echo 'root = "."' > /app/agent/.air.toml && \
+    echo 'testdata_dir = "testdata"' >> /app/agent/.air.toml && \
+    echo 'tmp_dir = "tmp"' >> /app/agent/.air.toml && \
+    echo '' >> /app/agent/.air.toml && \
+    echo '[build]' >> /app/agent/.air.toml && \
+    echo '  args_bin = []' >> /app/agent/.air.toml && \
+    echo '  bin = "./tmp/agent"' >> /app/agent/.air.toml && \
+    echo '  cmd = "go build -o ./tmp/agent ./agent"' >> /app/agent/.air.toml && \
+    echo '  delay = 1000' >> /app/agent/.air.toml && \
+    echo '  exclude_dir = ["assets", "tmp", "vendor", "testdata"]' >> /app/agent/.air.toml && \
+    echo '  exclude_file = []' >> /app/agent/.air.toml && \
+    echo '  exclude_regex = ["_test.go"]' >> /app/agent/.air.toml && \
+    echo '  exclude_unchanged = false' >> /app/agent/.air.toml && \
+    echo '  follow_symlink = false' >> /app/agent/.air.toml && \
+    echo '  full_bin = ""' >> /app/agent/.air.toml && \
+    echo '  include_dir = ["agent", "shared"]' >> /app/agent/.air.toml && \
+    echo '  include_ext = ["go", "tpl", "tmpl", "html"]' >> /app/agent/.air.toml && \
+    echo '  include_file = []' >> /app/agent/.air.toml && \
+    echo '  kill_delay = "0s"' >> /app/agent/.air.toml && \
+    echo '  log = "build-errors.log"' >> /app/agent/.air.toml && \
+    echo '  poll = false' >> /app/agent/.air.toml && \
+    echo '  poll_interval = 0' >> /app/agent/.air.toml && \
+    echo '  rerun = false' >> /app/agent/.air.toml && \
+    echo '  rerun_delay = 500' >> /app/agent/.air.toml && \
+    echo '  send_interrupt = false' >> /app/agent/.air.toml && \
+    echo '  stop_on_error = false' >> /app/agent/.air.toml
+
+CMD ["air", "-c", "/app/agent/.air.toml"]

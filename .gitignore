@@ -1,0 +1,50 @@
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+/agent/agent
+/services/*/main
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment & Config
+.env
+.env.*
+!.env.example
+.vars.json
+!.vars.json.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Docker
+docker-compose.override.yml
+
+# Go
+vendor/
+go.sum
+
+# Temporary
+tmp/
+temp/
+
+# Github
+.github/
