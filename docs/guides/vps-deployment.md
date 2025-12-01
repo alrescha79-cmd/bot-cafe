@@ -55,7 +55,7 @@ systemctl enable docker
 ```bash
 # Clone repository
 cd /opt
-git clone <your-repo-url> bot-cafe
+git clone https://github.com/alrescha79-cmd/bot-cafe.git
 cd bot-cafe
 
 # Setup environment
@@ -126,8 +126,6 @@ Edit `.vars.json`:
   ]
 }
 ```
-
-> ⚠️ **Security**: Jangan commit file ini! Sudah ada di `.gitignore`.
 
 ## 🔄 Running as System Service
 

@@ -215,7 +215,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👤 Author
 
-- **Alrescha79** - [alrescha79](https://github.com/alrescha79-cmd)
+- **Anggun Caksono** - [Github/alrescha79-cmd](https://github.com/alrescha79-cmd)
 
 Built with ❤️ using microservices architecture best practices.
 

@@ -18,7 +18,7 @@ Complete guide untuk setup development environment bot café.
 ### 1. Clone Repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/alrescha79-cmd/bot-cafe.git
 cd bot-cafe
 ```
 
